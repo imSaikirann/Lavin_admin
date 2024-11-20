@@ -1,117 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import axios from '';
+import React, { createContext, useContext, useState } from "react";
+import axios from "../Auth/axiosConfig";
 
-export default function Categories() {
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categoryName, setCategoryName] = useState('');
-  const [allowsInternalPages, setAllowsInternalPages] = useState(false);
+export const AppContext = createContext();
 
-  // Fetch categories from the backend
-  useEffect(() => {
-    axios.get('/api/getCategories')
-      .then(response => {
-        if (response.data.success) {
-          setCategories(response.data.data);
-        } else {
-          console.log('No categories found');
+export const useAppContext = () => {
+    return useContext(AppContext);
+};
+
+export const AppProvider = ({ children }) => {
+    const [products, setProducts] = useState([]); 
+    const [newVariant, setNewVariant] = useState({ color: "", size: "", stock: "" });
+    const [newVariantFiles, setNewVariantFiles] = useState(null); 
+  
+   
+ 
+
+
+ 
+
+    // Function to add a new variant
+    const handleAddVariant = async (productId) => {
+        const formData = new FormData();
+        formData.append("color", newVariant.color);
+        formData.append("size", newVariant.size);
+        formData.append("stock", newVariant.stock);
+
+        if (newVariantFiles) {
+            Array.from(newVariantFiles).forEach((file) => formData.append("files", file));
         }
-      })
-      .catch(error => console.error('Error fetching categories:', error));
-  }, []);
 
-  // Fetch details of a category by ID
-  const fetchCategoryById = (id) => {
-    axios.get(`/api/getCategory/${id}`)
-      .then(response => {
-        if (response.data.success) {
-          setSelectedCategory(response.data.data);
+        try {
+            const response = await axios.post(`/api/v1/bookProducts/addVariant/${productId}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            if (response.data.success) {
+                alert("Variant added successfully!");
+
+                // Update the product list with the new variant
+                setProducts((prevProducts) =>
+                    prevProducts.map((product) =>
+                        product.id === productId
+                            ? { ...product, variants: [...product.variants, response.data.data] }
+                            : product
+                    )
+                );
+
+                // Reset state after successful addition
+                setNewVariant({ color: "", size: "", stock: "" });
+                setNewVariantFiles(null);
+            } else {
+                alert("Failed to add variant: " + response.data.message);
+            }
+        } catch (error) {
+            console.error("Error adding variant:", error);
+            alert("An error occurred while adding the variant. Please try again.");
         }
-      })
-      .catch(error => console.error('Error fetching category:', error));
-  };
+    };
 
-  // Handle form submission to add a new category
-  const handleAddCategory = (e) => {
-    e.preventDefault();
-    axios.post('/api/addProductCategory', {
-      category: categoryName,
-      allowsInternalPages,
-    })
-    .then(response => {
-      if (response.data.success) {
-        setCategories([...categories, response.data.data]);
-        setCategoryName('');
-        setAllowsInternalPages(false);
-        alert('Category added successfully');
-      }
-    })
-    .catch(error => {
-      console.error('Error adding category:', error);
-      alert('Failed to add category');
-    });
-  };
+    // Function to cancel adding a new variant
+    const handleCancel = () => {
+        setNewVariant({ color: "", size: "", stock: "" });
+        setNewVariantFiles(null);
+    };
 
-  return (
-    <div className="container p-4">
-      <h1 className="text-2xl font-bold mb-4">Product Categories</h1>
+    // Function to delete a variant
+    const handleDeleteVariant = async (variantId) => {
+        try {
+            const response = await axios.delete(`/api/v1/bookProducts/deleteVariant/${variantId}`);
+            if (response.status === 200) {
+                alert("Variant deleted successfully!");
 
-      {/* Add Category Form */}
-      <form onSubmit={handleAddCategory} className="mb-4">
-        <input
-          type="text"
-          placeholder="Category Name"
-          value={categoryName}
-          onChange={(e) => setCategoryName(e.target.value)}
-          className="p-2 border rounded-md mb-2 w-full"
-          required
-        />
-        <div className="flex items-center mb-2">
-          <input
-            type="checkbox"
-            checked={allowsInternalPages}
-            onChange={() => setAllowsInternalPages(!allowsInternalPages)}
-            className="mr-2"
-          />
-          <label>Allow Internal Pages</label>
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded-md"
-        >
-          Add Category
-        </button>
-      </form>
+                // Remove the deleted variant from the state
+                setProducts((prevProducts) =>
+                    prevProducts.map((product) => ({
+                        ...product,
+                        variants: product.variants.filter((variant) => variant.id !== variantId),
+                    }))
+                );
+            } else {
+                alert("Failed to delete variant.");
+            }
+        } catch (error) {
+            console.error("Error deleting variant:", error);
+            alert("An error occurred. Please try again.");
+        }
+    };
 
-      {/* Categories List */}
-      <div className="space-y-4">
-        {categories.length > 0 ? (
-          categories.map((category) => (
-            <div key={category.id} className="border p-4 rounded-md">
-              <h2 className="text-xl font-semibold">{category.category}</h2>
-              <button
-                onClick={() => fetchCategoryById(category.id)}
-                className="text-blue-500 hover:underline mt-2"
-              >
-                View Details
-              </button>
-            </div>
-          ))
-        ) : (
-          <p>No categories available</p>
-        )}
-      </div>
+    // Function to remove a review
+    const removeReview = async (reviewId) => {
+        try {
+            const response = await axios.delete(`/api/v1/reviews/deleteReview/${reviewId}`);
+            if (response.status === 200) {
+                alert("Review removed successfully!");
+            } else {
+                alert("Failed to remove review.");
+            }
+        } catch (error) {
+            console.error("Error removing review:", error);
+            alert("An error occurred. Please try again.");
+        }
+    };
 
-      {/* Category Details */}
-      {selectedCategory && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold">Category Details</h2>
-          <div className="border p-4 rounded-md mt-4">
-            <p><strong>Category Name:</strong> {selectedCategory.category}</p>
-            <p><strong>Allows Internal Pages:</strong> {selectedCategory.allowsInternalPages ? 'Yes' : 'No'}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+ 
+    const values = {
+        products,
+        setProducts,
+        newVariant,
+        setNewVariant,
+        newVariantFiles,
+        setNewVariantFiles,
+        handleAddVariant,
+        handleCancel,
+        handleDeleteVariant,
+        removeReview,
+
+    };
+
+    return <AppContext.Provider value={values}>{children}</AppContext.Provider>;
+};

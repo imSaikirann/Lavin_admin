@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../Auth/axiosConfig";
+
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,7 +10,6 @@ export default function Orders() {
     const fetchOrders = async () => {
       try {
         const response = await axios.get("/api/v1/orders/getAllOrders");
-        
         setOrders(response.data);
         setLoading(false);
       } catch (error) {
@@ -27,42 +27,45 @@ export default function Orders() {
 
   return (
     <div className="p-6 sm:pl-80">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800 ">Orders</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 border border-gray-300 text-left">Order ID</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">User</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Order Items</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Order Date</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Total Amount</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border border-gray-300">{order.id}</td>
-                <td className="px-4 py-2 border border-gray-300">
-                  {order.user?.name} ({order.user?.email})
-                </td>
-                <td className="px-4 py-2 border border-gray-300">
-                  <ul className="list-disc pl-5">
-                    {order.orderItems.map((item, index) => (
-                      <li key={index}>
-                        {item.productName} ({item.quantity} pcs)
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-                <td className="px-4 py-2 border border-gray-300">{new Date(order.orderDate).toLocaleDateString()}</td>
-                <td className="px-4 py-2 border border-gray-300">${order.totalAmount}</td>
-                <td className="px-4 py-2 border border-gray-300">{order.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">Orders</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {orders.map((order) => (
+          <div key={order.id} className="border border-gray-300 rounded-lg p-4 shadow-md">
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Order ID: {order.id}</h3>
+            <div className="text-gray-600 mb-2">
+              <p className="font-semibold">User: </p>
+              <p>{order.user?.firstName} {order.user?.lastName} ({order.user?.email})</p>
+              <p>{order.user?.street}, {order.user?.city}, {order.user?.state}, {order.user?.country}</p>
+            </div>
+
+            <div className="mb-2"> 
+              <p className="font-semibold">Order Items:</p>
+              <ul className="list-disc pl-5">
+                {order.orderItems.map((item, index) => (
+                  <li key={item.id}>
+                    <img src={item.variantImage} alt={item.variant.color} className="w-16 h-16 mr-2 inline-block" />
+                    {item.productName} ({item.quantity} pcs) - {item.variant.color}
+                  </li>
+                ))} 
+              </ul>
+            </div>
+
+            <div className="mb-2">
+              <p className="font-semibold">Order Date:</p>
+              <p>{new Date(order.createdAt).toLocaleDateString()}</p>
+            </div>
+
+            <div className="mb-2">
+              <p className="font-semibold">Total Amount:</p>
+              <p>${order.totalAmount}</p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Status:</p>
+              <p>{order.status}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

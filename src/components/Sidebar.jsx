@@ -14,7 +14,7 @@ export default function Sidebar() {
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div>
+    <div className=''>
       {/* Sidebar toggle button for mobile view */}
       <div className="md:hidden flex flex-row-reverse items-center justify-between p-4 sm:pl-72 h-16 font-poppins">
         <button
@@ -77,7 +77,7 @@ export default function Sidebar() {
                   View Products
                 </Link>
                 <Link
-                  to="/dashboard/products/add"
+                  to="/dashboard/product"
                   className="p-2 text-black rounded-md hover:bg-orange-600 hover:text-white"
                   onClick={closeSidebar}
                 >
@@ -145,19 +145,13 @@ export default function Sidebar() {
             {isDropdownOpenCustomers && (
               <div className="flex flex-col bg-white shadow-md rounded-md p-2 mt-1">
                 <Link
-                  to="/dashboard/customers"
+                  to="/userdata"
                   className="p-2 text-black rounded-md hover:bg-orange-600 hover:text-white"
                   onClick={closeSidebar}
                 >
-                  View Customers
+                  View Users
                 </Link>
-                <Link
-                  to="/dashboard/customers/add"
-                  className="p-2 text-black rounded-md hover:bg-orange-600 hover:text-white"
-                  onClick={closeSidebar}
-                >
-                  Add Customer
-                </Link>
+              
               </div>
             )}
           </div>
