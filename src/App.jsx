@@ -8,6 +8,7 @@ import ProductManagement from './pages/ProductMangement'
 import AddSpecfication from './pages/AddSpecfication'
 import EditProductSpecification from './pages/EditSpec'
 import UserData from './pages/UserData'
+import Events from './pages/Events'
 
 export default function App() {
   return (
@@ -22,6 +23,8 @@ export default function App() {
       <Route path="/product/addSpecification/:id" element={<AddSpecfication/>} />
       <Route path="/product/editSpecification/:id" element={<EditProductSpecification/>} /> 
       <Route path="/userdata" element={<UserData/>} /> 
+      <Route path="/events" element={<Events/>} /> 
+
 
 
 

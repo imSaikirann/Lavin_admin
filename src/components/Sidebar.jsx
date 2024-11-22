@@ -53,6 +53,14 @@ export default function Sidebar() {
             <span>Admin Dashboard</span>
           </Link>
 
+          <Link
+            to="/events"
+            className="rounded-md p-3 hover:bg-orange-600 hover:text-white transition-all duration-200 flex items-center gap-2"
+            onClick={closeSidebar}
+          >
+            <span>Events</span>
+          </Link>
+
           {/* Products Dropdown */}
           <div className="relative">
             <button
