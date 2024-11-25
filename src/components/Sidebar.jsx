@@ -78,14 +78,14 @@ export default function Sidebar() {
             {isDropdownOpenProducts && (
               <div className="flex flex-col bg-white shadow-md rounded-md p-2 mt-1">
                 <Link
-                  to="/dashboard/products"
+                  to="/allproducts"
                   className="p-2 text-black rounded-md hover:bg-orange-600 hover:text-white"
                   onClick={closeSidebar}
                 >
                   View Products
                 </Link>
                 <Link
-                  to="/dashboard/product"
+                  to="/addProduct"
                   className="p-2 text-black rounded-md hover:bg-orange-600 hover:text-white"
                   onClick={closeSidebar}
                 >

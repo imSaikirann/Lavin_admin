@@ -17,14 +17,18 @@ const EditProductSpecification = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hasSpecifications, setHasSpecifications] = useState(false);
 
   useEffect(() => {
     const fetchSpecification = async () => {
       try {
         const response = await axios.get(`/api/v1/specifications/getProductSpecification/${id}`);
-        setSpecification(response.data.data);
+        const { specifications } = response.data.data;
+        setHasSpecifications(specifications && specifications.length > 0);
+        setSpecification(specifications.length > 0 ? specifications[0] : {});
         setLoading(false);
       } catch (err) {
+        console.log(err);
         setError('Error fetching specification');
         setLoading(false);
       }
@@ -43,10 +47,20 @@ const EditProductSpecification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/v1/specifications/editProductSpecification/${id}`, specification);
-      alert('Product specification updated successfully');
+      if (hasSpecifications) {
+        const res = await axios.put(`/api/v1/specifications/editProductSpecification/${specification.id}`, specification);
+        console.log(res)
+        alert('Product specification updated successfully');
+      } else {
+        await axios.post(`/api/v1/specifications/addProductSpecification/${id}`, {
+
+          ...specification,
+        });
+        alert('Product specification added successfully');
+      }
     } catch (err) {
-      alert('Error updating product specification');
+      console.log(err)
+      alert('Error saving product specification');
     }
   };
 
@@ -55,7 +69,9 @@ const EditProductSpecification = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 sm:pl-80">
-      <h2 className="text-2xl font-semibold mb-6 text-center">Edit Product Specification</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-center">
+        {hasSpecifications ? 'Edit Product Specification' : 'Add Product Specification'}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
@@ -155,7 +171,7 @@ const EditProductSpecification = () => {
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Update Specification
+            {hasSpecifications ? 'Update Specification' : 'Add Specification'}
           </button>
         </div>
       </form>

@@ -6,10 +6,10 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data from the API
     const fetchOrders = async () => {
       try {
         const response = await axios.get("/api/v1/orders/getAllOrders");
+        console.log(response.data);
         setOrders(response.data);
         setLoading(false);
       } catch (error) {
@@ -33,12 +33,13 @@ export default function Orders() {
           <div key={order.id} className="border border-gray-300 rounded-lg p-4 shadow-md">
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Order ID: {order.id}</h3>
             <div className="text-gray-600 mb-2">
-              <p className="font-semibold">User: </p>
-              <p>{order.user?.firstName} {order.user?.lastName} ({order.user?.email})</p>
-              <p>{order.user?.street}, {order.user?.city}, {order.user?.state}, {order.user?.country}</p>
+              <p>Name: {order.user.firstName}</p>
+            </div>
+            <div className="text-gray-600 mb-2">
+              <p>Phone number: {order.phone}</p>
             </div>
 
-            <div className="mb-2"> 
+            <div className="mb-2">
               <p className="font-semibold">Order Items:</p>
               <ul className="list-disc pl-5">
                 {order.orderItems.map((item, index) => (
@@ -46,7 +47,7 @@ export default function Orders() {
                     <img src={item.variantImage} alt={item.variant.color} className="w-16 h-16 mr-2 inline-block" />
                     {item.productName} ({item.quantity} pcs) - {item.variant.color}
                   </li>
-                ))} 
+                ))}
               </ul>
             </div>
 
@@ -58,6 +59,13 @@ export default function Orders() {
             <div className="mb-2">
               <p className="font-semibold">Total Amount:</p>
               <p>${order.totalAmount}</p>
+            </div>
+
+            <div className="mb-2">
+              <p className="font-semibold">Address:</p>
+              <p>
+                {order.address.street}, {order.address.city}, {order.address.state}, {order.address.pinCode}, {order.address.country}
+              </p>
             </div>
 
             <div>

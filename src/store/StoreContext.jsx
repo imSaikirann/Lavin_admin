@@ -101,7 +101,37 @@ export const AppProvider = ({ children }) => {
             alert("An error occurred. Please try again.");
         }
     };
-
+    async function handleUpdateVariant(variantId, updatedData) {
+        console.log(updatedData)
+        try {
+            const formData = new FormData();
+            formData.append('size', updatedData.size);
+            formData.append('stock', updatedData.stock);
+            formData.append('color', updatedData.color);
+    
+            if (updatedData.images) {
+                Array.from(updatedData.images).forEach((file) => {
+                    formData.append('files', file);
+                });
+            }
+    
+            const response = await axios.put(`/api/v1/bookProducts/editVariant/${variantId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+    
+            if (response.data.success) {
+                alert('Variant updated successfully!');
+            } else {
+                alert(response.data.message);
+            }
+        } catch (error) {
+            console.error('Error updating variant:', error);
+            alert('An error occurred while updating the variant.');
+        }
+    }
+    
  
     const values = {
         products,
@@ -114,6 +144,7 @@ export const AppProvider = ({ children }) => {
         handleCancel,
         handleDeleteVariant,
         removeReview,
+        handleUpdateVariant
 
     };
 
